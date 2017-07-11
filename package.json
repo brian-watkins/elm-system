@@ -1,0 +1,19 @@
+{
+  "name": "elm-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "elm-system.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^2.6.0"
+  },
+  "dependencies": {
+    "history": "^4.6.3",
+    "underscore": "^1.8.3",
+    "url-pattern": "^1.0.3"
+  }
+}
