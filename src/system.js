@@ -1,15 +1,24 @@
 var _ = require("underscore")
 var Router = require("./router")
 var Route = require("./route")
+var Program = require("./program")
 var PortCommand = require("./portCommand")
+var Middleware = require("./middleware")
 
 var System = function (history) {
-  var self = this
-  this.mountNode = null
+  var mountNode = null
+  var middleware = null
+  var worker = null
   var router = new Router()
+  var globalFlags = null
+  var currentRouteElement = null
 
   this.useFlags = function(flags) {
-    this.globalFlags = flags
+    globalFlags = flags
+  }
+
+  this.useProgram = function(elmProgram, flags, configCallback) {
+    middleware = new Middleware(new Program(elmProgram, flags, configCallback))
   }
 
   this.route = function (path) {
@@ -20,25 +29,70 @@ var System = function (history) {
   }
 
   this.mount = function(node) {
-    this.mountNode = node
-    updateRoute(history.location)
+    mountNode = node
+
+    mountWorker()
+
+    mountRoutes()
+
+    history.listen(function(location, action) {
+      updateRoute()
+    })
+
+    updateRoute()
   }
 
-  history.listen(function(location, action) {
-    updateRoute(location)
-  })
+  var mountRoutes = function() {
+    router.routes().forEach(function(route) {
+      route.mount(globalFlags, function(program) {
+        changeLocationCommand().attachTo(program)
+      })
+    })
+  }
 
-  var updateRoute = function(location) {
-    var match = router.match(location.pathname)
-    if (match) {
-      var flags = _.extend(self.globalFlags || {}, match.params)
-      match.route.mount(self.mountNode, flags, function(program) {
-        var changeLocationCommand = new PortCommand("changeLocation", function(path) {
-          history.push(path)
-        })
-        changeLocationCommand.attachTo(program)
+  var mountWorker = function() {
+    if (middleware) {
+      middleware.mount(globalFlags, function(worker) {
+        changeLocationCommand().attachTo(worker)
+        nextCommand().attachTo(worker)
       })
     }
+  }
+
+  var updateRoute = function() {
+    if (middleware) {
+      middleware.sendRequest(globalFlags)
+    } else {
+      dispatch()
+    }
+  }
+
+  var changeLocationCommand = function() {
+    return new PortCommand("changeLocation", function(path) {
+      history.push(path)
+    })
+  }
+
+  var nextCommand = function() {
+    return new PortCommand("next", function(flags) {
+      dispatch(flags)
+    })
+  }
+
+  dispatch = function(flags) {
+    var match = router.match(history.location.pathname)
+    if (match) {
+      match.route.prepareToShowWithFlags(_.extend(match.params, flags))
+      showRoute(match.route.element)
+    }
+  }
+
+  var showRoute = function(element) {
+    if (currentRouteElement) {
+      mountNode.removeChild(currentRouteElement)
+    }
+    mountNode.appendChild(element)
+    currentRouteElement = element
   }
 }
 

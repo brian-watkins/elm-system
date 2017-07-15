@@ -5,12 +5,28 @@ var Program = function (elm, flags, configCallback) {
   this.flags = flags
   this.configure = configCallback
 
+  this.worker = function(flags) {
+    var worker = this.elm.worker(allFlags(flags))
+
+    if (this.configure) {
+      this.configure(worker)
+    }
+
+    return worker
+  }
+
   this.embed = function(mountNode, flags) {
-    var embeddedProgram = this.elm.embed(mountNode, _.extend(flags || {}, this.flags))
+    var embeddedProgram = this.elm.embed(mountNode, allFlags(flags))
     if (this.configure) {
       this.configure(embeddedProgram)
     }
     return embeddedProgram
+  }
+
+  var self = this
+
+  var allFlags = function(flags) {
+    return _.extend(flags || {}, self.flags)
   }
 }
 
