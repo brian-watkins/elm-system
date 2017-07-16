@@ -2,11 +2,10 @@
 
 Elm System helps you compose many Elm programs into a web application.
 
-You can associate an Elm program with a route, so that all requests to that routed
-are handled by that program. You can also associate a headless Elm program as middleware
-that will handle each request before it is passed to the program associated with the route.
-Middleware gives you a chance to redirect the request or add flags that will be passed to
-the route program.
+Associate an Elm program with a route, and all requests to that route
+will be handled by that program. Use a headless Elm program as middleware, giving
+you a change to redirect a request or add flags that will be passed to the route
+program.
 
 ## Example
 
@@ -46,7 +45,7 @@ port request : (a -> msg) -> Sub msg
 
 where `a` is the record type you expect. By subscribing to this port, your program
 will be notified whenever a new request to the program's associated route is received.
-The incoming flags are composed of route parameters (see below) and any flags added
+The incoming record is composed of route parameters (see below) and any flags added
 by middleware.
 
 For middleware, you must add two ports:
@@ -134,4 +133,12 @@ programs will be mounted under this node.
 
 ```
 system.mount(document.getElementById("main"))
+```
+
+## Development
+
+To run the tests:
+
+```
+npm test
 ```
