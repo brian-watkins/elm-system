@@ -3,9 +3,9 @@
 Elm System helps you compose many Elm programs into a web application.
 
 Associate an Elm program with a route, and all requests to that route
-will be handled by that program. Use a headless Elm program as middleware, giving
-you a change to redirect a request or add flags that will be passed to the route
-program.
+will be handled by that program. You can also use a headless Elm program as
+middleware, which could redirect a request as necessary or add flags that
+will be passed to the route program.
 
 ## Example
 
