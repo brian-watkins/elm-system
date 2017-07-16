@@ -2,13 +2,11 @@ var _ = require("underscore")
 var Router = require("./router")
 var Route = require("./route")
 var Program = require("./program")
-var PortCommand = require("./portCommand")
 var Middleware = require("./middleware")
 
 var System = function (history) {
   var mountNode = null
   var middleware = null
-  var worker = null
   var router = new Router()
   var globalFlags = null
   var currentRouteElement = null
@@ -45,16 +43,16 @@ var System = function (history) {
   var mountRoutes = function() {
     router.routes().forEach(function(route) {
       route.mount(globalFlags, function(program) {
-        changeLocationCommand().attachTo(program)
+        subscribeToChangeLocation(program)
       })
     })
   }
 
   var mountWorker = function() {
     if (middleware) {
-      middleware.mount(globalFlags, function(worker) {
-        changeLocationCommand().attachTo(worker)
-        nextCommand().attachTo(worker)
+      middleware.mount(globalFlags, function(program) {
+        subscribeToChangeLocation(program)
+        subscribeToNext(program)
       })
     }
   }
@@ -67,14 +65,14 @@ var System = function (history) {
     }
   }
 
-  var changeLocationCommand = function() {
-    return new PortCommand("changeLocation", function(path) {
+  var subscribeToChangeLocation = function(program) {
+    program.subscribeToCommand("changeLocation", function(path) {
       history.push(path)
     })
   }
 
-  var nextCommand = function() {
-    return new PortCommand("next", function(flags) {
+  var subscribeToNext = function(program) {
+    program.subscribeToCommand("next", function(flags) {
       dispatch(flags)
     })
   }

@@ -1,32 +1,38 @@
 var _ = require("underscore")
 
-var Program = function (elm, flags, configCallback) {
-  this.elm = elm
-  this.flags = flags
-  this.configure = configCallback
+var Program = function (program, flags, configCallback) {
+  var instanceFlags = flags
+  var instanceConfigure = configCallback
+  var instance
 
-  this.worker = function(flags) {
-    var worker = this.elm.worker(allFlags(flags))
+  var initialize = function(initializer, flags) {
+    instance = initializer(allFlags(flags))
 
-    if (this.configure) {
-      this.configure(worker)
+    if (instanceConfigure) {
+      instanceConfigure(instance)
     }
+  }
 
-    return worker
+  this.initWorker = function(flags) {
+    initialize(program.worker, flags)
   }
 
   this.embed = function(mountNode, flags) {
-    var embeddedProgram = this.elm.embed(mountNode, allFlags(flags))
-    if (this.configure) {
-      this.configure(embeddedProgram)
-    }
-    return embeddedProgram
+    initialize(_.partial(program.embed, mountNode), flags)
   }
 
-  var self = this
+  this.sendRequest = function(flags) {
+    instance.ports.request.send(flags)
+  }
+
+  this.subscribeToCommand = function(name, executor) {
+    if (instance.ports && _.has(instance.ports, name)) {
+        instance.ports[name].subscribe(executor)
+    }
+  }
 
   var allFlags = function(flags) {
-    return _.extend(flags || {}, self.flags)
+    return _.extend(flags || {}, instanceFlags)
   }
 }
 

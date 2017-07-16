@@ -3,26 +3,25 @@ var Program = require("./program")
 var Route = function(path) {
   this.path = path
   this.element = null
-  var elm = null
-  var embeddedProgram = null
+  var routeProgram = null
 
   this.program = function(elmProgram, flags, configCallback) {
-    elm = new Program(elmProgram, flags, configCallback)
+    routeProgram = new Program(elmProgram, flags, configCallback)
   }
 
-  this.mount = function (flags, configCallback) {
+  this.mount = function (flags, systemConfigure) {
     this.element = document.createElement("div")
     this.element.setAttribute("id", "program-at-" + this.path)
 
-    embeddedProgram = elm.embed(this.element, flags)
+    routeProgram.embed(this.element, flags)
 
-    if (configCallback) {
-      configCallback(embeddedProgram)
+    if (systemConfigure) {
+      systemConfigure(routeProgram)
     }
   }
 
   this.prepareToShowWithFlags = function(flags) {
-    embeddedProgram.ports.request.send(flags)
+    routeProgram.sendRequest(flags)
   }
 }
 
