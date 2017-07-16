@@ -1,1 +1,137 @@
 # elm-system
+
+Elm System helps you compose many Elm programs into a web application.
+
+You can associate an Elm program with a route, so that all requests to that routed
+are handled by that program. You can also associate a headless Elm program as middleware
+that will handle each request before it is passed to the program associated with the route.
+Middleware gives you a chance to redirect the request or add flags that will be passed to
+the route program.
+
+## Example
+
+```
+var System = require("elm-system")
+var AuthProgram = require("./elm/Authorization.elm")
+var LoginProgram = require("./elm/Login.elm")
+var ShowProgram = require("./elm/ShowStuff.elm")
+
+var system = System()
+
+system.useFlags({ baseUrl: "/api" })
+
+system.useProgram(AuthProgram.Authorization)
+
+system.route("/login").program(LoginProgram.Login)
+
+system.route("/stuff/:stuffId").program(ShowProgram.ShowStuff, {}, function(app) {
+  app.ports.doSomething.subscribe(function(things) {
+    //some javascript
+  })
+})
+
+system.mount(document.getElementById("main"))
+```
+
+## Setup
+
+To facilitate communication between the Elm programs that compose your web application
+and Elm System, you'll need to add some ports to your programs.
+
+For the Html program associated with a route, you must add:
+
+```
+port request : (a -> msg) -> Sub msg
+```
+
+where `a` is the record type you expect. By subscribing to this port, your program
+will be notified whenever a new request to the program's associated route is received.
+The incoming flags are composed of route parameters (see below) and any flags added
+by middleware.
+
+For middleware, you must add two ports:
+
+```
+port request : (a -> msg) -> Sub msg
+port next : b -> Cmd msg
+```
+
+where `a` is the record type you expect for each request and `b` is the record type
+passed on to the route program. The middleware program is notified via the `request`
+subscription on every request. Right now, the global flags are passed to the middleware
+on each request, but this is likely to change.
+
+Once the middleware program has completed any processing,
+it must call `next` to send the command that will pass the request to the route program.
+The route program will receive any flags passed with this command.
+
+Any type of program may add the following port:
+
+```
+port changeLocation : String -> Cmd msg
+```
+
+This function creates a command that changes the location to the path provided.
+With Elm System, you must use this port command to update the location (instead of,
+for example, elm-lang/navigation).
+
+## Configuration
+
+### Global Flags
+
+Specify flags that will be passed to each program upon initialization:
+
+```
+system.useFlags({ aFlag: "flag1", bFlag: "flag2" })
+```
+
+### Middleware
+
+Specify a headless Elm program that will handle each request:
+
+```
+system.useProgram(MyElm.Worker, someProgramFlags, callback)
+```
+
+where `someProgramFlags` are the flags to pass to the program upon initialization
+and `callback` is a function that takes the initialized program. Use `callback` to
+configure the worker once it has been initialized (add any extra ports, etc).
+
+### Routing
+
+Specify a route and associate it with an Elm program like so:
+
+```
+system.route("/my/route").program(MyElm.App, someProgramFlags, callback)
+```
+
+where `someProgramFlags` are the flags to pass to the program upon initialization
+and `callback` is a function that takes the initialized program. Use `callback` to
+configure the program once it has been initialized (add any extra ports, etc).
+
+The route path may contain parameters. These will be passed to the Elm
+program as part of the record sent to the `request` port. So, if you configure
+a route like so:
+
+```
+system.route("/my/:thing/:id").program(MyElm.App)
+```
+
+then a request to `/my/books/17` will result in the `request` port being called with a record that looks like:
+
+```
+{ thing = "books"
+, id = "17"
+}
+```
+
+Note that all the values are strings.
+
+### Mounting
+
+Once you have configured Elm System, just call `mount` with an Html Element. The
+programs will be mounted under this node.
+
+```
+system.mount(document.getElementById("main"))
+```
