@@ -1,22 +1,9 @@
-var UrlPattern = require('url-pattern')
-
 var Router = function() {
-  var routeInfo = []
-
-  this.routes = function() {
-    return routeInfo.map(function(info) { return info.route })
-  }
-
-  this.add = function(route) {
-    var pattern = new UrlPattern(route.path)
-    routeInfo.push({pattern: pattern, route: route})
-  }
-
-  this.match = function(path) {
-    for (var i = 0; i < routeInfo.length; i++) {
-      var params = routeInfo[i].pattern.match(path)
+  this.match = function(path, routes) {
+    for (var i = 0; i < routes.length; i++) {
+      var params = routes[i].pattern.match(path)
       if (params) {
-        return { route: routeInfo[i].route, params: params }
+        return { route: routes[i], params: params }
       }
     }
 

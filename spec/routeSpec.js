@@ -1,7 +1,7 @@
 var Route = require("../src/route.js")
 var FakeElement = require("./fakes/fakeElement.js")
 
-describe("route", function() {
+xdescribe("route", function() {
   var subject
   var elmProgram
 

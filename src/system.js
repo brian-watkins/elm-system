@@ -1,96 +1,55 @@
-var _ = require("underscore")
-var Router = require("./router")
-var Route = require("./route")
+var RouteConfig = require("./routeConfig")
 var Program = require("./program")
-var Middleware = require("./middleware")
+var Configuration = require("./configuration")
 
-var System = function (history) {
-  var mountNode = null
-  var middleware = null
-  var router = new Router()
-  var globalFlags = null
-  var currentRouteElement = null
+//This should really be a SystemConfigurator
+var System = function (history, stateService, runtime) {
+  var config = new Configuration()
 
   this.useFlags = function(flags) {
-    globalFlags = flags
+    config.globalFlags = flags
   }
 
-  this.useProgram = function(elmProgram, flags, configCallback) {
-    middleware = new Middleware(new Program(elmProgram, flags, configCallback))
+  this.useProgram = function(code, flags, configCallback) {
+    config.middlewareProgram = new Program(code, flags, configCallback)
   }
 
   this.route = function (path) {
-    var route = new Route(path)
-    router.add(route)
+    var routeConfig = new RouteConfig(path)
+    config.routes.push(routeConfig)
 
-    return route
+    return routeConfig
   }
+
+  //This should just initialize the runtime object with the config
+  //runtime can hold its own state and register with the history, etc
+  //OR there's something that initializes the state of the system and
+  //passes that to the runtime. Runtime shouldn't care about starting
+  //things up, just handling things once the system is ready.
+
+  //The runtime needs a router (which contains the list of routes),
+  //a location service, and a middleware (which contains the middleware programs),
+  //also a display (which knows about the mountNode and how to show/display nodes)
+  //The entities are Route, MiddlewareProgram, RouteProgram
+  //Maybe don't try to put together the HtmlProgram and the WorkerProgram, just
+  //have some ElmService that knows how to do things?
+
+  //RunTime is kind of like an interactor.
+  //SystemConfigurator is another interactor. It deals with different entities:
+  //routeConfig and programConfig. You can create
+  //a route and a program given these objects.
+
+  //what about display on a web page? Isn't that a detail?
+  //But maybe a library is different from an application.
 
   this.mount = function(node) {
-    mountNode = node
+    var state = stateService.initialize(node, config)
 
-    mountWorker()
-
-    mountRoutes()
-
-    history.listen(function(location, action) {
-      updateRoute()
+    history.listen(function() {
+      runtime.updateRoute(state)
     })
 
-    updateRoute()
-  }
-
-  var mountRoutes = function() {
-    router.routes().forEach(function(route) {
-      route.mount(globalFlags, function(program) {
-        subscribeToChangeLocation(program)
-      })
-    })
-  }
-
-  var mountWorker = function() {
-    if (middleware) {
-      middleware.mount(globalFlags, function(program) {
-        subscribeToChangeLocation(program)
-        subscribeToNext(program)
-      })
-    }
-  }
-
-  var updateRoute = function() {
-    if (middleware) {
-      middleware.sendRequest(globalFlags)
-    } else {
-      dispatch()
-    }
-  }
-
-  var subscribeToChangeLocation = function(program) {
-    program.subscribeToCommand("changeLocation", function(path) {
-      history.push(path)
-    })
-  }
-
-  var subscribeToNext = function(program) {
-    program.subscribeToCommand("next", function(flags) {
-      dispatch(flags)
-    })
-  }
-
-  dispatch = function(flags) {
-    var match = router.match(history.location.pathname)
-    if (match) {
-      match.route.prepareToShowWithFlags(_.extend(match.params, flags))
-      showRoute(match.route.element)
-    }
-  }
-
-  var showRoute = function(element) {
-    if (currentRouteElement) {
-      mountNode.removeChild(currentRouteElement)
-    }
-    mountNode.appendChild(element)
-    currentRouteElement = element
+    runtime.updateRoute(state)
   }
 }
 

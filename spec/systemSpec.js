@@ -1,8 +1,18 @@
 var History = require("history")
 var System = require("../src/system")
+var Router = require("../src/router")
 var FakeWorkerProgram = require("./fakes/fakeWorkerProgram")
 var FakeProgram = require("./fakes/fakeProgram")
 var FakeElement = require("./fakes/fakeElement")
+var WorkerProgramService = require("../src/program/workerProgramService")
+var MiddlewareService = require("../src/middlewareService")
+var RouteService = require("../src/routeService")
+var HtmlProgramService = require("../src/program/htmlProgramService")
+var InstanceService = require("../src/program/instanceService")
+var Runtime = require("../src/runtime")
+var StateService = require("../src/stateService")
+var ChangeLocationSubscription = require("../src/subscriptions/changeLocationSubscription")
+var NextSubscription = require("../src/subscriptions/nextSubscription")
 
 describe("System", function () {
   var subject
@@ -33,7 +43,21 @@ describe("System", function () {
     anotherElmProgram = jasmine.createSpyObj("anotherElmProgram", [ "embed" ])
     anotherElmProgram.embed.and.returnValue(anotherFakeProgram)
 
-    subject = new System(fakeHistory);
+    var runtime = new Runtime(
+      fakeHistory,
+      new Router(),
+      new RouteService(new HtmlProgramService(), new InstanceService()),
+      new InstanceService()
+    )
+
+    var stateService = new StateService(
+      new ChangeLocationSubscription(fakeHistory, new InstanceService()),
+      new NextSubscription(new InstanceService(), runtime),
+      new RouteService(new HtmlProgramService(), new InstanceService()),
+      new MiddlewareService(new WorkerProgramService(), new InstanceService())
+    )
+
+    subject = new System(fakeHistory, stateService, runtime)
   })
 
   describe("#mount", function() {
