@@ -3,10 +3,6 @@ var UrlPattern = require('url-pattern')
 var Router = function() {
   var routeInfo = []
 
-  this.routes = function() {
-    return routeInfo.map(function(info) { return info.route })
-  }
-
   this.add = function(route) {
     var pattern = new UrlPattern(route.path)
     routeInfo.push({pattern: pattern, route: route})

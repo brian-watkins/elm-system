@@ -13,8 +13,8 @@ describe("System", function () {
   var fakeProgram, anotherFakeProgram
 
   beforeEach(function() {
-    document = jasmine.createSpyObj("document", [ "createElement" ])
-    document.createElement.and.callFake(function(tag) {
+    var htmlDocument = jasmine.createSpyObj("document", [ "createElement" ])
+    htmlDocument.createElement.and.callFake(function(tag) {
       return new FakeElement(tag)
     })
 
@@ -33,7 +33,7 @@ describe("System", function () {
     anotherElmProgram = jasmine.createSpyObj("anotherElmProgram", [ "embed" ])
     anotherElmProgram.embed.and.returnValue(anotherFakeProgram)
 
-    subject = new System(fakeHistory);
+    subject = new System(fakeHistory, htmlDocument);
   })
 
   describe("#mount", function() {
@@ -47,14 +47,14 @@ describe("System", function () {
 
     it("embeds all the registered programs in their own nodes", function() {
       expect(elmProgram.embed).toHaveBeenCalled()
-      expect(elmProgram.embed.calls.mostRecent().args[0].attributes.id).toBe("program-at-/current-route")
+      expect(elmProgram.embed.calls.mostRecent().args[0].attributes.id).toBe("/current-route")
 
       expect(anotherElmProgram.embed).toHaveBeenCalled()
-      expect(anotherElmProgram.embed.calls.mostRecent().args[0].attributes.id).toBe("program-at-/another-route")
+      expect(anotherElmProgram.embed.calls.mostRecent().args[0].attributes.id).toBe("/another-route")
     })
 
     it("makes the element associated with the program at the current route a child of the mount node", function() {
-      expect(mountNode.childToAppend.attributes.id).toBe("program-at-/current-route")
+      expect(mountNode.childToAppend.attributes.id).toBe("/current-route")
     })
   })
 
@@ -164,16 +164,6 @@ describe("System", function () {
     })
 
     describe("when a matching request is received", function() {
-      it("passes all current flags to the program", function() {
-        var flags = { myFlag: "flag" }
-        subject.useFlags(flags)
-        subject.useProgram(elmWorker)
-        subject.route("/current-route").program(elmProgram)
-        subject.mount(mountNode)
-
-        expect(fakeWorker.requestFlags).toBe(flags)
-      })
-
       describe("when the next command is called", function() {
         it("passes the updated flags from the worker to the program at the route", function() {
           var flags = { myFlag: "flag" }
@@ -231,10 +221,11 @@ describe("System", function () {
       subject.route("/current-route").program(anotherElmProgram)
       subject.mount(mountNode)
 
+      expect(mountNode.childToAppend.attributes.id).toBe("/current-route")
+
       fakeHistory.push("/another-route")
 
-      expect(mountNode.childToRemove.attributes.id).toBe("program-at-/current-route")
-      expect(mountNode.childToAppend.attributes.id).toBe("program-at-/another-route")
+      expect(mountNode.childToAppend.attributes.id).toBe("/another-route")
     })
   })
 })
