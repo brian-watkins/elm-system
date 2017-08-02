@@ -1,5 +1,5 @@
 var _ = require("underscore")
-var SubscribableProgram = require("./SubscribableProgram")
+var SubscribableElmProgram = require("./SubscribableElmProgram")
 
 var ElmHtmlProgram = function(programDescription, flags, mountNode) {
   var instance = programDescription.code.embed(mountNode, _.extend(flags || {}, programDescription.flags))
@@ -11,7 +11,7 @@ var ElmHtmlProgram = function(programDescription, flags, mountNode) {
     instance.ports.request.send(flags)
   }
 
-  SubscribableProgram(this, instance)
+  SubscribableElmProgram(this, instance)
 }
 
 module.exports = ElmHtmlProgram

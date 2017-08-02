@@ -1,5 +1,5 @@
-var ElmWorker = require("../../src/processRequests/entities/ElmWorker")
-var ElmProgramDescription = require("../../src/configureSystem/ElmProgramDescription")
+var ElmWorker = require("../../src/htmlSystem/adapters/ElmWorker")
+var ElmProgramDescription = require("../../src/htmlSystem/configuration/ElmProgramDescription")
 var FakeWorkerProgram = require("../fakes/fakeWorkerProgram")
 
 describe("ElmWorker", function() {

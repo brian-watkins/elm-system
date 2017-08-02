@@ -1,6 +1,6 @@
-var System = require("./src/system")
+var SystemAPI = require("./src/htmlSystem/configuration/SystemAPI")
 var History = require("history")
 
 module.exports = function() {
-  return new System(History.createBrowserHistory(), document)
+  return new SystemAPI(History.createBrowserHistory(), document)
 }

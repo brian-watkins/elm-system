@@ -1,5 +1,5 @@
 var _ = require("underscore")
-var SubscribableProgram = require("./SubscribableProgram")
+var SubscribableElmProgram = require("./SubscribableElmProgram")
 
 var ElmWorker = function(programDescription, flags) {
   var instance = programDescription.code.worker(_.extend(flags || {}, programDescription.flags))
@@ -12,7 +12,7 @@ var ElmWorker = function(programDescription, flags) {
     instance.ports.request.send(null)
   }
 
-  SubscribableProgram(this, instance)
+  SubscribableElmProgram(this, instance)
 }
 
 module.exports = ElmWorker

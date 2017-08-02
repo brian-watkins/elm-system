@@ -1,5 +1,5 @@
-var ElmWorker = require("./processRequests/entities/ElmWorker")
-var Route = require("./processRequests/entities/Route")
+var ElmWorker = require("../adapters/ElmWorker")
+var HtmlRoute = require("../adapters/HtmlRoute")
 
 var SystemConfigurator = function(htmlDocument, router, middleware, display, changeLocationPort, nextPort) {
 
@@ -14,7 +14,7 @@ var SystemConfigurator = function(htmlDocument, router, middleware, display, cha
     }
 
     config.routeDescriptions.forEach(function(routeDescription) {
-      var route = new Route(routeDescription)
+      var route = new HtmlRoute(routeDescription)
 
       var element = htmlDocument.createElement("div")
       element.setAttribute("id", route.path)

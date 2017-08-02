@@ -1,6 +1,6 @@
 var _ = require("underscore")
 
-var SubscribableProgram = function(obj, instance) {
+var SubscribableElmProgram = function(obj, instance) {
 
   obj.subscribeToCommand = function(command) {
     if (instance.ports && _.has(instance.ports, command.name)) {
@@ -11,4 +11,4 @@ var SubscribableProgram = function(obj, instance) {
 }
 
 
-module.exports = SubscribableProgram
+module.exports = SubscribableElmProgram

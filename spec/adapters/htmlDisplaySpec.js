@@ -1,4 +1,4 @@
-var HtmlDisplay = require("../src/htmlDisplay")
+var HtmlDisplay = require("../../src/htmlSystem/adapters/HtmlDisplay")
 
 var FakeHtmlElement = function() {
   this.firstChild = null

@@ -1,4 +1,4 @@
-var BrowserLocation = require("../src/browserLocation")
+var BrowserLocation = require("../../src/htmlSystem/adapters/BrowserLocation")
 var History = require("history")
 
 describe("BrowserLocation", function() {
