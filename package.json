@@ -1,13 +1,19 @@
 {
   "name": "elm-system",
   "version": "1.0.0",
-  "description": "",
+  "description": "Deploy a system of Elm applications as a single-page web app.",
+  "keywords": [ "elm" ],
+  "homepage": "https://github.com/brian-watkins/elm-system",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/brian-watkins/elm-system"
+  },
   "main": "elm-system.js",
   "scripts": {
     "test": "jasmine"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Brian Watkins",
+  "license": "MIT",
   "devDependencies": {
     "jasmine": "^2.6.0"
   },
