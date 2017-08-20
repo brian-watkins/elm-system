@@ -8,8 +8,8 @@ var ElmWorker = function(programDescription, flags) {
     programDescription.configCallback(instance)
   }
 
-  this.handleRequest = function() {
-    instance.ports.request.send(null)
+  this.handleRequest = function(flags) {
+    instance.ports.request.send(flags)
   }
 
   SubscribableElmProgram(this, instance)

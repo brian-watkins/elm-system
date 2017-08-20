@@ -1,5 +1,5 @@
-var ElmHtmlProgram = require("../../src/htmlSystem/adapters/ElmHtmlProgram")
-var ElmProgramDescription = require("../../src/htmlSystem/configuration/ElmProgramDescription")
+var ElmHtmlProgram = require("../../../src/processRequests/adapters/ElmHtmlProgram")
+var ElmProgramDescription = require("../../../src/configuration/ElmProgramDescription")
 
 describe("ElmHtmlProgram", function() {
 

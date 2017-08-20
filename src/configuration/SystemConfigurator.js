@@ -1,5 +1,5 @@
-var ElmWorker = require("../adapters/ElmWorker")
-var HtmlRoute = require("../adapters/HtmlRoute")
+var ElmWorker = require("../processRequests/adapters/ElmWorker")
+var HtmlRoute = require("../processRequests/adapters/HtmlRoute")
 
 var SystemConfigurator = function(htmlDocument, router, middleware, display, changeLocationPort, nextPort) {
 

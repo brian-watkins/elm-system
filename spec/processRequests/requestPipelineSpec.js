@@ -6,6 +6,9 @@ describe("RequestPipeline", function() {
   var fakeMiddleware
   var fakeRouteInteractor
   var fakeLocation = {
+    currentPath: function () {
+      return "/some-fake-path"
+    },
     listen: function(callback) {
       this.callback = callback
     }
@@ -27,7 +30,7 @@ describe("RequestPipeline", function() {
       })
 
       it("notifies the middleware", function() {
-        expect(fakeMiddleware.handleRequest).toHaveBeenCalled()
+        expect(fakeMiddleware.handleRequest).toHaveBeenCalledWith({path: "/some-fake-path"})
       })
     })
 

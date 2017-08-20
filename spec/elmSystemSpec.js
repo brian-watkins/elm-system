@@ -1,5 +1,5 @@
 var History = require("history")
-var System = require("../src/htmlSystem/configuration/SystemAPI")
+var System = require("../src/configuration/SystemAPI")
 var FakeWorkerProgram = require("./fakes/fakeWorkerProgram")
 var FakeProgram = require("./fakes/fakeProgram")
 var FakeElement = require("./fakes/fakeElement")

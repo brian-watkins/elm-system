@@ -16,9 +16,10 @@ describe("middlware", function() {
     })
 
     it("tells the worker to handle the request", function() {
-      subject.handleRequest()
+      var flags = {}
+      subject.handleRequest(flags)
 
-      expect(fakeWorker.handleRequest).toHaveBeenCalled()
+      expect(fakeWorker.handleRequest).toHaveBeenCalledWith(flags)
     })
 
     it("has workers", function() {

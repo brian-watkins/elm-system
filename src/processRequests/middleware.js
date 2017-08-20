@@ -11,8 +11,8 @@ var Middleware = function() {
     workerProgram = worker
   }
 
-  this.handleRequest = function() {
-    workerProgram.handleRequest()
+  this.handleRequest = function(flags) {
+    workerProgram.handleRequest(flags)
   }
 
 }

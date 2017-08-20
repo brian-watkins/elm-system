@@ -1,6 +1,6 @@
-var ElmWorker = require("../../src/htmlSystem/adapters/ElmWorker")
-var ElmProgramDescription = require("../../src/htmlSystem/configuration/ElmProgramDescription")
-var FakeWorkerProgram = require("../fakes/fakeWorkerProgram")
+var ElmWorker = require("../../../src/processRequests/adapters/ElmWorker")
+var ElmProgramDescription = require("../../../src/configuration/ElmProgramDescription")
+var FakeWorkerProgram = require("../../fakes/fakeWorkerProgram")
 
 describe("ElmWorker", function() {
 
@@ -31,7 +31,7 @@ describe("ElmWorker", function() {
   })
 
   describe("#handleRequest", function() {
-    it("sends null to the request port", function() {
+    it("sends flags to the request port", function() {
       var fakeCode = jasmine.createSpyObj('fakeCode', [ 'worker' ])
 
       var fakeWorker = new FakeWorkerProgram()
@@ -40,9 +40,9 @@ describe("ElmWorker", function() {
       var programDescription = new ElmProgramDescription(fakeCode)
 
       var subject = new ElmWorker(programDescription, { globalFlag: "another" })
-      subject.handleRequest()
+      subject.handleRequest({someFlag: "myFlag"})
 
-      expect(fakeWorker.requestFlags).toBe(null)
+      expect(fakeWorker.requestFlags).toEqual({someFlag: "myFlag"})
     })
   })
 

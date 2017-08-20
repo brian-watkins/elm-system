@@ -1,4 +1,4 @@
-var SystemAPI = require("./src/htmlSystem/configuration/SystemAPI")
+var SystemAPI = require("./src/configuration/SystemAPI")
 var History = require("history")
 
 module.exports = function() {

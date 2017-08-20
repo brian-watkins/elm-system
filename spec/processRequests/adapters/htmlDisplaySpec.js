@@ -1,7 +1,7 @@
-var HtmlDisplay = require("../../src/htmlSystem/adapters/HtmlDisplay")
+var HtmlDisplay = require("../../../src/processRequests/adapters/HtmlDisplay")
 
 var FakeHtmlElement = function() {
-  this.firstChild = null
+  this.firstElementChild = null
   this.didCallRemove = false
 
   this.removeChild = function(child) {
@@ -37,7 +37,7 @@ describe("HtmlDisplay", function() {
       var firstChild = {}
 
       beforeEach(function() {
-        fakeMountElement.firstChild = firstChild
+        fakeMountElement.firstElementChild = firstChild
       })
 
       it("removes the first (and only) route node from the root", function() {
