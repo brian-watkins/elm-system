@@ -57,8 +57,12 @@ port next : b -> Cmd msg
 
 where `a` is the record type you expect for each request and `b` is the record type
 passed on to the route program. The middleware program is notified via the `request`
-subscription on every request. Right now, the global flags are passed to the middleware
-on each request, but this is likely to change.
+subscription on every request. The following flags are passed on each request:
+
+```
+{ path: '/the-current-path'
+}
+```
 
 Once the middleware program has completed any processing,
 it must call `next` to send the command that will pass the request to the route program.
@@ -108,15 +112,16 @@ where `someProgramFlags` are the flags to pass to the program upon initializatio
 and `callback` is a function that takes the initialized program. Use `callback` to
 configure the program once it has been initialized (add any extra ports, etc).
 
+The route may contain wildcards using the `*` character.
 The route path may contain parameters. These will be passed to the Elm
 program as part of the record sent to the `request` port. So, if you configure
 a route like so:
 
 ```
-system.route("/my/:thing/:id").program(MyElm.App)
+system.route("/my/:thing/:id/*").program(MyElm.App)
 ```
 
-then a request to `/my/books/17` will result in the `request` port being called with a record that looks like:
+then a request to `/my/books/17/otherStuff` will result in the `request` port being called with a record that looks like:
 
 ```
 { thing = "books"
