@@ -1,16 +1,20 @@
 var History = require("history")
 var System = require("../src/configuration/SystemAPI")
-var FakeWorkerProgram = require("./fakes/fakeWorkerProgram")
-var FakeProgram = require("./fakes/fakeProgram")
 var FakeElement = require("./fakes/fakeElement")
+var {
+  fakeProgramFrom,
+  fakeWorkerFrom,
+  createCodeSpy,
+  expectProgramMountedAtNodeWithId,
+  expectProgramCreatedWithFlags
+} = require("./testHelpers")
 
 describe("System", function () {
   var subject
   var fakeHistory
   var mountNode
-  var elmProgram
-  var anotherElmProgram
-  var fakeProgram, anotherFakeProgram
+  var elmProgram, anotherElmProgram
+  var fakeProgram
 
   beforeEach(function() {
     var htmlDocument = jasmine.createSpyObj("document", [ "createElement" ])
@@ -25,13 +29,11 @@ describe("System", function () {
 
     mountNode = new FakeElement("div")
 
-    fakeProgram = new FakeProgram()
-    elmProgram = jasmine.createSpyObj("elmProgram", [ "embed" ])
-    elmProgram.embed.and.returnValue(fakeProgram)
+    elmProgram = createCodeSpy()
+    fakeProgram = fakeProgramFrom(elmProgram)
 
-    anotherFakeProgram = new FakeProgram()
-    anotherElmProgram = jasmine.createSpyObj("anotherElmProgram", [ "embed" ])
-    anotherElmProgram.embed.and.returnValue(anotherFakeProgram)
+    anotherElmProgram = createCodeSpy()
+    fakeProgramFrom(anotherElmProgram)
 
     subject = new System(fakeHistory, htmlDocument);
   })
@@ -46,11 +48,8 @@ describe("System", function () {
     })
 
     it("embeds all the registered programs in their own nodes", function() {
-      expect(elmProgram.embed).toHaveBeenCalled()
-      expect(elmProgram.embed.calls.mostRecent().args[0].attributes.id).toBe("/current-route")
-
-      expect(anotherElmProgram.embed).toHaveBeenCalled()
-      expect(anotherElmProgram.embed.calls.mostRecent().args[0].attributes.id).toBe("/another-route")
+      expectProgramMountedAtNodeWithId(elmProgram, "/current-route")
+      expectProgramMountedAtNodeWithId(anotherElmProgram, "/another-route")
     })
 
     it("makes the element associated with the program at the current route a child of the mount node", function() {
@@ -60,8 +59,7 @@ describe("System", function () {
 
   describe("when the program has a port for changeLocation", function() {
     it("changes the history when the port command is received", function() {
-      var embeddedProgram = new FakeProgram()
-      elmProgram.embed.and.returnValue(embeddedProgram)
+      var embeddedProgram = fakeProgramFrom(elmProgram)
 
       subject.route("/current-route").program(elmProgram)
       subject.mount(mountNode)
@@ -80,7 +78,7 @@ describe("System", function () {
       subject.route("/current-route").program(elmProgram)
       subject.mount(mountNode)
 
-      expect(elmProgram.embed.calls.mostRecent().args[1]).toBe(flags)
+      expectProgramCreatedWithFlags(elmProgram, flags)
     })
   })
 
@@ -88,9 +86,8 @@ describe("System", function () {
     var elmWorker, fakeWorker
 
     beforeEach(function () {
-      elmWorker = jasmine.createSpyObj("elmWorker", [ "worker" ])
-      fakeWorker = new FakeWorkerProgram()
-      elmWorker.worker.and.returnValue(fakeWorker)
+      elmWorker = createCodeSpy()
+      fakeWorker = fakeWorkerFrom(elmWorker)
     })
 
     describe("when the system is mounted", function() {
@@ -100,14 +97,13 @@ describe("System", function () {
 
           subject.mount(mountNode)
 
-          expect(elmWorker.worker).toHaveBeenCalled()
+          expectProgramCreatedWithFlags(elmWorker, {})
         })
       })
 
       describe("when the program has a port for changeLocation", function() {
         it("changes the history when the port command is received", function() {
-          var fakeWorker = new FakeWorkerProgram(true)
-          elmWorker.worker.and.returnValue(fakeWorker)
+          var fakeWorker = fakeWorkerFrom(elmWorker)
 
           subject.useProgram(elmWorker)
           subject.mount(mountNode)
@@ -125,7 +121,7 @@ describe("System", function () {
 
           subject.mount(mountNode)
 
-          expect(elmWorker.worker).toHaveBeenCalledWith(flags)
+          expectProgramCreatedWithFlags(elmWorker, flags)
         })
       })
 
@@ -137,7 +133,7 @@ describe("System", function () {
 
           subject.mount(mountNode)
 
-          expect(elmWorker.worker).toHaveBeenCalledWith(flags)
+          expectProgramCreatedWithFlags(elmWorker, flags)
         })
 
         it("passes both global and program flags to the program", function () {
@@ -147,7 +143,7 @@ describe("System", function () {
 
           subject.mount(mountNode)
 
-          expect(elmWorker.worker).toHaveBeenCalledWith({ myFlag: "flag", anotherFlag: "fun" })
+          expectProgramCreatedWithFlags(elmWorker, { myFlag: "flag", anotherFlag: "fun" })
         })
       })
 
@@ -206,16 +202,6 @@ describe("System", function () {
   })
 
   describe("when the history changes", function() {
-    var fakeWorker, fakeProgram
-
-    beforeEach(function() {
-      fakeProgram = new FakeProgram()
-      elmProgram.embed.and.returnValue(fakeProgram)
-
-      anotherFakeProgram = new FakeProgram()
-      anotherElmProgram.embed.and.returnValue(anotherFakeProgram)
-    })
-
     it("embeds the program associated with the route into the mount node", function() {
       subject.route("/another-route").program(elmProgram)
       subject.route("/current-route").program(anotherElmProgram)

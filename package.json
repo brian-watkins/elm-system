@@ -1,12 +1,14 @@
 {
   "name": "elm-system",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Deploy a system of Elm applications as a single-page web app.",
-  "keywords": [ "elm" ],
+  "keywords": [
+    "elm"
+  ],
   "homepage": "https://github.com/brian-watkins/elm-system",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/brian-watkins/elm-system"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brian-watkins/elm-system"
   },
   "main": "elm-system.js",
   "scripts": {
@@ -18,7 +20,7 @@
     "jasmine": "^2.6.0"
   },
   "dependencies": {
-    "history": "^4.6.3",
+    "history": "^4.7.2",
     "underscore": "^1.8.3",
     "url-pattern": "^1.0.3"
   }

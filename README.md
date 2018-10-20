@@ -7,6 +7,11 @@ will be handled by that program. You can also use a headless Elm program as
 middleware, which could redirect a request as necessary or add flags that
 will be passed to the route program.
 
+## Elm Version
+
+- Elm System 2.x requires Elm 0.19
+- Elm System 1.x requires Elm 0.18
+
 ## Example
 
 ```
@@ -19,11 +24,11 @@ var system = System()
 
 system.useFlags({ baseUrl: "/api" })
 
-system.useProgram(AuthProgram.Authorization)
+system.useProgram(AuthProgram.Elm.Authorization)
 
-system.route("/login").program(LoginProgram.Login)
+system.route("/login").program(LoginProgram.Elm.Login)
 
-system.route("/stuff/:stuffId").program(ShowProgram.ShowStuff, {}, function(app) {
+system.route("/stuff/:stuffId").program(ShowProgram.Elm.ShowStuff, {}, function(app) {
   app.ports.doSomething.subscribe(function(things) {
     //some javascript
   })

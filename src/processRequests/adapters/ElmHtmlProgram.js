@@ -2,7 +2,11 @@ var _ = require("underscore")
 var SubscribableElmProgram = require("./SubscribableElmProgram")
 
 var ElmHtmlProgram = function(programDescription, flags, mountNode) {
-  var instance = programDescription.code.embed(mountNode, _.extend(flags || {}, programDescription.flags))
+  var instance = programDescription.code.init({
+    node: mountNode,
+    flags: _.extend(flags || {}, programDescription.flags)
+  })
+
   if (programDescription.configCallback) {
     programDescription.configCallback(instance)
   }

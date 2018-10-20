@@ -1,5 +1,5 @@
 
-var FakeWorkerProgram = function(canChangeLocation) {
+var FakeWorkerProgram = function() {
   this.nextFunction = null
   this.requestFlags = null
   this.changeLocationFunction = null
@@ -18,11 +18,8 @@ var FakeWorkerProgram = function(canChangeLocation) {
       },
       unsubscribe: function(f) {
       }
-    }
-  }
-
-  if (canChangeLocation) {
-    this.ports.changeLocation = {
+    },
+    changeLocation: {
       subscribe: function (f) {
         self.changeLocationFunction = f
       }
